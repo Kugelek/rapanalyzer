@@ -1,23 +1,33 @@
 import React,{FunctionComponent, useState, useEffect} from 'react';
 import './Home.modules.scss';
+import './Analysis.modules.scss';
 import { AutoComplete } from 'antd';
 import axios, {AxiosResponse, AxiosRequestConfig} from 'axios';
+import BarChart from './BarChart/BarChart';
 export interface HomeProps {
     
 }
-
-const mockVal = (str: string, repeat: number = 1) => {
-    return {
-      value: str.repeat(repeat),
-    };
-  };
-
+interface AnalysisData  {
+  title:string;
+  author:string;
+  sentiment:number;
+  topFiveWords: Array<topWord>;
+}
+interface topWord {
+  word:string;
+  count:number;
+}
 
 const Home: FunctionComponent<HomeProps> = () => {
     const [value, setValue] = useState('');
     const [options, setOptions] = useState<{ value: string }[]>([]);
     const [optionsFullData, setOptionsFullData] = useState([]);
     const [chosen, setChosen] = useState('');
+    const [analysis, setAnalysis] = useState<AnalysisData>({  
+      title: "",
+      author: "",
+      sentiment: 0,
+      topFiveWords: []});
 
     const fetchSearchResults = async (searchParam:string ): Promise<any> => {
       console.log(searchParam);
@@ -51,7 +61,7 @@ const Home: FunctionComponent<HomeProps> = () => {
       axios.get("/api/analysis",{params: body})
         .then((resp: AxiosResponse) => {
           console.log(resp.data);
-          setOptionsFullData(resp.data);
+          setAnalysis(resp.data);
           return resp.data;
         })
         .catch(err => console.log(err));
@@ -107,7 +117,27 @@ const Home: FunctionComponent<HomeProps> = () => {
       </>
       : null
       }
-      {/* <div>{result}</div> */}
+      {analysis && analysis.topFiveWords.length === 5 ?
+        <div className="analysis-box">
+          <p className="analysis-box__pre">Song title:</p>
+          <h5 className="analysis-box__title">{analysis.title}</h5>
+          <p className="analysis-box__pre">Author:</p>
+          <h5 className="analysis-box__author">{analysis.author}</h5>
+
+          <div className="sentiment-box"> {analysis.sentiment}</div>
+          <div className="topwords">
+            <ul className="topwords__list">
+              {analysis.topFiveWords.map(wordObj => <div>
+                
+              </div> )}
+            </ul>
+          </div>
+          <BarChart topWordsData={analysis.topFiveWords}/>
+         
+        </div>
+        : null
+      }
+      
         </main>
         </div>
      );
