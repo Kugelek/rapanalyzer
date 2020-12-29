@@ -10,3 +10,12 @@
     color: #f76252;
   }
 }
+.sentiment-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  &__pre {
+    margin-top: -0.5rem;
+  }
+}

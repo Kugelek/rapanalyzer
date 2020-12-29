@@ -55,7 +55,7 @@ const DonutChart: FunctionComponent<DonutChartProps> = (props) => {
       <div className="center-circle"></div>
   </RadialChart>
         </div>
-        <div>{topWordsCountSum}</div>
+        
         </>
       );
   }

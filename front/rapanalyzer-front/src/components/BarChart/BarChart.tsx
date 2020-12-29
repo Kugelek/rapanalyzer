@@ -36,7 +36,7 @@ interface topWord {
 
     return (
         <div>
-          <XYPlot xType="ordinal" width={300} height={200} xDistance={200}>
+          <XYPlot xType="ordinal" width={400} height={200} xDistance={200}>
             <VerticalGridLines />
             <HorizontalGridLines />
             <XAxis />

@@ -6,6 +6,7 @@ import axios, {AxiosResponse, AxiosRequestConfig} from 'axios';
 import BarChart from './BarChart/BarChart';
 import SentimentFace from './SentimentFace/SentimentFace';
 import DonutChart from './DonutChart/DonutChart';
+import PropagateLoader from './PropagateLoader/PropagateLoader';
 export interface HomeProps {
     
 }
@@ -33,10 +34,14 @@ const Home: FunctionComponent<HomeProps> = () => {
       topFiveWords: [],
       lyrics: ""});
 
+    const [loadingSearch, setLoadingSearch] = useState(false);
+    const [loadingAnalysis, setLoadingAnalysis] = useState(false);
+
     const fetchSearchResults = async (searchParam:string ): Promise<any> => {
       console.log(searchParam);
       if(!searchParam || searchParam.length < 2)
         return;
+      setLoadingSearch(true);
       const body:any = {
         query: searchParam
       }
@@ -45,6 +50,7 @@ const Home: FunctionComponent<HomeProps> = () => {
         .then((resp: AxiosResponse) => {
           console.log(resp.data);
           setOptionsFullData(resp.data);
+          setLoadingSearch(false);
           return resp.data;
         })
         .catch(err => console.log(err));
@@ -52,8 +58,7 @@ const Home: FunctionComponent<HomeProps> = () => {
 
     const fetchAnalysis = async (): Promise<any> => {
      
-      // if(!searchParam || searchParam.length < 2)
-      //   return;
+     setLoadingAnalysis(true);
       const [title, author] = chosen.split(" by ");
       console.log(title);
       console.log(author);
@@ -66,6 +71,7 @@ const Home: FunctionComponent<HomeProps> = () => {
         .then((resp: AxiosResponse) => {
           console.log(resp.data);
           setAnalysis(resp.data);
+          setLoadingAnalysis(false);
           return resp.data;
         })
         .catch(err => console.log(err));
@@ -74,14 +80,9 @@ const Home: FunctionComponent<HomeProps> = () => {
     
 
     const onSearch = async (searchText: string) => {
-        // setOptions(
-        //   !searchText ? [] : [mockVal(searchText), mockVal(searchText, 2), mockVal(searchText, 3)],
-        // ); 
-         await fetchSearchResults(value);
-        //  console.log(results);
-        //  const arr = 
-        setOptions(
         
+         await fetchSearchResults(value);
+        setOptions(
           !value  ? [] : optionsFullData.map((song:any) => {return {value: song.title +" by " + song.artist.name}}),
         );
       };
@@ -111,37 +112,45 @@ const Home: FunctionComponent<HomeProps> = () => {
         onChange={onChange}
         placeholder="Find a song..."
       />
+      {loadingSearch ?  <PropagateLoader/> : null}
 
       {chosen ? 
       <>
+      <p className="picked">Picked song:</p>
         <div className="mainbox__chosen">
-        {chosen}
+        
+        <p className="mainbox__chosen-title">{chosen}</p>
+        <button className="mainbox__submit" onClick={fetchAnalysis}>Analyze</button>
         </div>
-        <button className="" onClick={fetchAnalysis}></button>
+        
       </>
       : null
       }
+      {loadingAnalysis ?  <PropagateLoader/> : null}
+
       {analysis && analysis.topFiveWords.length === 5 ?
         <div className="analysis-box">
-          <p className="analysis-box__pre">Song title:</p>
-          <h5 className="analysis-box__title">{analysis.title}</h5>
-          <p className="analysis-box__pre">Author:</p>
-          <h5 className="analysis-box__author">{analysis.author}</h5>
-
-          <div className="sentiment-box"> {analysis.sentiment}</div>
-          <div className="topwords">
-            <ul className="topwords__list">
-              {analysis.topFiveWords.map(wordObj => <div>
-                
-              </div> )}
-            </ul>
+          <div className="analysis-box__intro">
+            <div className="analysis-box__left">
+            <p className="analysis-box__pre">Song title:</p>
+            <h5 className="analysis-box__title">{analysis.title}</h5>
+            <p className="analysis-box__pre">Author:</p>
+            <h5 className="analysis-box__author">{analysis.author}</h5>
+            <p className="analysis-box__pre">Words used:</p>
+            <h5 className="analysis-box__author">{analysis.lyrics.split(" ").length}</h5>
+            </div>
+            <SentimentFace sentiment={analysis.sentiment}/>
           </div>
+      
+          <h3 className="barchart__heading">Top 5 most used words</h3>
           <BarChart topWordsData={analysis.topFiveWords}/>
-          <SentimentFace sentiment={analysis.sentiment}/>
-          <p>{analysis.lyrics.split(" ").length}</p>
-          <p>{analysis.lyrics}</p>
+
+          <h3 className="donutchart__heading">Percentage of most used words in lyrics</h3>
           <DonutChart topWordsData={analysis.topFiveWords} allWords={analysis.lyrics.split(" ").length}/>
-         
+
+          <h3 className="lyrics__heading">Analyzed concatenated lyrics</h3>
+          <p>{analysis.lyrics}</p>
+        
         </div>
         : null
       }

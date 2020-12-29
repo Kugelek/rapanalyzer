@@ -13,10 +13,14 @@ const SentimentFace: FunctionComponent<SentimentFaceProps> = (props) => {
         return <MehOutlined className="icon icon--neutral "/>;
     }
 
+
     return(
-        <div>
+        <div className="sentiment-box">
         
             <p> {getFaceIcon()}</p>
+            <span className="sentiment-box__pre">Sentiment score</span>
+            <span className="sentiment-box__result">{props.sentiment.toFixed(5)}</span>
+           
         </div>
     );
 }
