@@ -1,0 +1,12 @@
+.icon {
+  font-size: 5rem;
+  &--happy {
+    color: #12939a;
+  }
+  &--neutral {
+    color: #e6cc0b;
+  }
+  &--sad {
+    color: #f76252;
+  }
+}

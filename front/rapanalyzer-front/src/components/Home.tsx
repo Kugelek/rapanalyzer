@@ -4,6 +4,8 @@ import './Analysis.modules.scss';
 import { AutoComplete } from 'antd';
 import axios, {AxiosResponse, AxiosRequestConfig} from 'axios';
 import BarChart from './BarChart/BarChart';
+import SentimentFace from './SentimentFace/SentimentFace';
+import DonutChart from './DonutChart/DonutChart';
 export interface HomeProps {
     
 }
@@ -12,6 +14,7 @@ interface AnalysisData  {
   author:string;
   sentiment:number;
   topFiveWords: Array<topWord>;
+  lyrics: string;
 }
 interface topWord {
   word:string;
@@ -27,7 +30,8 @@ const Home: FunctionComponent<HomeProps> = () => {
       title: "",
       author: "",
       sentiment: 0,
-      topFiveWords: []});
+      topFiveWords: [],
+      lyrics: ""});
 
     const fetchSearchResults = async (searchParam:string ): Promise<any> => {
       console.log(searchParam);
@@ -105,7 +109,7 @@ const Home: FunctionComponent<HomeProps> = () => {
         onSelect={onSelect}
         onSearch={onSearch}
         onChange={onChange}
-        placeholder="control mode"
+        placeholder="Find a song..."
       />
 
       {chosen ? 
@@ -133,6 +137,10 @@ const Home: FunctionComponent<HomeProps> = () => {
             </ul>
           </div>
           <BarChart topWordsData={analysis.topFiveWords}/>
+          <SentimentFace sentiment={analysis.sentiment}/>
+          <p>{analysis.lyrics.split(" ").length}</p>
+          <p>{analysis.lyrics}</p>
+          <DonutChart topWordsData={analysis.topFiveWords} allWords={analysis.lyrics.split(" ").length}/>
          
         </div>
         : null
