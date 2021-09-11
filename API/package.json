@@ -32,5 +32,8 @@
     "genius-lyrics-fetcher": "^2.1.0",
     "natural": "^2.2.2",
     "stopword": "^1.0.6"
+  },
+  "devDependencies": {
+    "typescript": "^4.4.2"
   }
 }
